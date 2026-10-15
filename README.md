@@ -12,7 +12,11 @@ An original, Windows-first, open-source data recovery application planned around
 
 ## Current state
 
-The repository currently holds a research baseline and original architecture plan, not a recovery engine implementation.
+This repository holds the research baseline and architecture. The
+companion implementation is
+[`heictojpgpics/data-wizard-rs`](https://github.com/heictojpgpics/data-wizard-rs)
+(Rust core + Tauri 2 + React UI); engines that ship there are real and
+fixture-tested - see its README support matrix.
 
 - [Clean-room research charter](docs/00-clean-room-charter.md)
 - [Evidence-backed product study](docs/01-observed-reference-architecture.md)
@@ -22,6 +26,7 @@ The repository currently holds a research baseline and original architecture pla
 - [Recovery algorithm reconstruction](docs/05-recovery-algorithm-reconstruction.md)
 - [Utility algorithm architecture](docs/06-utility-algorithm-architecture.md)
 - [Engineering program](docs/07-engineering-program.md)
+- [Deep RE findings: drivers and modules](docs/08-driver-and-module-re.md)
 - [Worklog](docs/WORKLOG.md)
 
 ## Scope of the first release
