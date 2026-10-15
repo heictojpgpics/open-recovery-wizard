@@ -2,7 +2,7 @@
 
 ## Product boundary
 
-The initial Windows release handles local physical disks, attached removable media, and read-only image files. It recovers from NTFS, FAT32, exFAT, and EXT4 volumes, and uses raw carving as a filesystem-independent fallback. The architecture intentionally has no dependency on a reference product.
+The initial Windows release handles local physical disks, attached removable media, and read-only image files. It recovers from NTFS, FAT32, exFAT, and EXT4 volumes, and uses raw carving as a filesystem-independent fallback. It also includes read-only disk health, sandboxed preview, and deliberately narrow post-recovery repair utilities. The architecture intentionally has no dependency on a reference product.
 
 ## Layered design
 
@@ -32,6 +32,9 @@ flowchart TD
 | `recovery-session` | SQLite index and versioned checkpoint encoding. | Bind a resume state to an unverified device. |
 | `recovery-preview` | MIME-aware sample/range rendering via constrained adapters. | Parse untrusted bytes in the UI process. |
 | `recovery-export` | Destination validation, sparse-aware copy, atomic finalization, hash verification. | Export onto the source device. |
+| `recovery-health` | Documented read-only disk inventory, SMART/NVMe log collection, raw/protocol-preserving normalization. | Change disk settings or issue mutating control commands. |
+| `recovery-inspect` | Capability-routed, sandboxed preview metadata and thumbnail broker. | Parse untrusted formats in the UI process. |
+| `recovery-repair-*` | Explicit, format-specific repair to a new output with a repair report. | Replace the original or bypass password/encryption controls. |
 | `recovery-app` | Tauri commands, authorization boundary, UI event translation. | Contain scanning logic. |
 
 ## Scan protocol
@@ -68,4 +71,6 @@ Signatures are original versioned data files. A signature can declare headers, o
 3. NTFS deleted-record path, runlist validation, and sparse/non-resident data export.
 4. Declarative raw carving with JPEG, PNG, PDF, ZIP, and MP4 validators.
 5. EXT4 metadata recovery and job/session resumption.
-6. Physical-disk access, privilege-boundary hardening, Windows installer, MSIX packaging, and signed release pipeline.
+6. Read-only disk health telemetry and sandboxed preview workers.
+7. Format-specific repair utilities, beginning with ZIP validation/extraction and image/PDF structural checks.
+8. Physical-disk access, privilege-boundary hardening, Windows installer, MSIX packaging, and signed release pipeline.

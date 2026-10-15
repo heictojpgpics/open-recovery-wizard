@@ -18,8 +18,9 @@ The repository currently holds a research baseline and original architecture pla
 - [Evidence-backed product study](docs/01-observed-reference-architecture.md)
 - [Original recovery-engine architecture](docs/02-original-engine-architecture.md)
 - [Validation and safety plan](docs/03-validation-and-safety.md)
+- [Utility subsystem study](docs/04-utility-subsystems-study.md)
 - [Worklog](docs/WORKLOG.md)
 
 ## Scope of the first release
 
-Local Windows storage only: physical disks, partitions, removable media, and image files. The core paths are filesystem-aware scan, deleted-file recovery, raw carving, preview, and safe export. Network, NAS, Linux, RAID, cloud, damaged-system rescue, and health features are later milestones.
+Local Windows storage only: physical disks, partitions, removable media, and image files. The core paths are filesystem-aware scan, deleted-file recovery, raw carving, preview, safe export, and a separately sandboxed utility layer for file repair, disk health, and media/document viewing. Network, NAS, Linux, RAID, cloud, and damaged-system rescue remain later milestones.

@@ -16,3 +16,9 @@
 4. Implement safe export guardrails before any recovery parser.
 5. Add FAT32/exFAT scanner with property and integration tests.
 6. Create a controlled, disposable Windows observation plan for externally visible workflow comparison.
+
+## 2026-10-15 — utility subsystem extension
+
+- Expanded static analysis to the supplied file-repair, disk-health, media-viewing, Office-viewing, and PDF-viewing bundles.
+- Recorded evidence for separate repair workers, Qt/QML health telemetry, vendor/transport-aware SMART and NVMe handling, FFmpeg-based media components, and dedicated preview processes.
+- Extended the original architecture with read-only health collection and isolated preview/repair brokers. Added strict no-mutation, no-encryption-bypass, licensing, provenance, and worker-isolation rules.

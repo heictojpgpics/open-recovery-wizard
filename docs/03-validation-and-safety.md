@@ -16,6 +16,8 @@ Use only synthetic, self-created images for automated tests. Build fixture famil
 | Destination safety | Same physical disk and source path aliases are rejected before export. |
 | Resource controls | Peak memory, cancellation latency, and progress cadence are measured on CI/nightly fixture tiers. |
 | Robustness | Fuzzers and corpus mutations never crash, hang, write the source, or exceed configured memory limits. |
+| Preview/repair isolation | Malformed documents and media can crash only their worker; source scan/session state and UI stay alive. |
+| Health safety | Every disk-health request is audited against an allowlist of documented read-only telemetry commands. |
 
 ## Windows test environment
 
