@@ -24,7 +24,7 @@ The two ZIP archives are complementary deployment trees, not split segments: ext
 | Subsystem | Evidence | Confidence | Clean-room requirement |
 | --- | --- | --- | --- |
 | Device/partition layer | Dedicated device, partition, manager, boot, volume and recovery modules; exported storage-device operations include `DeviceIoControl`. | High | Separate read-only block-device abstraction with range-checked reads and a partition map. |
-| Filesystem-aware scan | Standalone x64 modules: NTFS, FAT, exFAT, EXT4, Btrfs, ReFS, ZFS and HFS+. NTFS and EXT4 export distinct quick and standard searcher constructors. | High | Per-filesystem parsers behind a stable scanner trait; first release supports NTFS, FAT32, exFAT and EXT4. |
+| Filesystem-aware scan | Standalone x64 modules: NTFS, FAT, exFAT, EXT4, Btrfs, ReFS, ZFS and HFS+. Each exposes a distinct quick and standard/complete searcher constructor. | High | Per-filesystem parsers behind a stable scanner trait; first release supports NTFS, FAT32, exFAT and EXT4. |
 | Raw carving | `RAWSearchDLL.dll` exports raw-searcher factory and analyser-list/map functions. JSON configuration contains 139 signature definitions, 46 with tail constraints, plus size bounds. | High | Declarative signatures plus a bounded streaming carver with header, footer, size, and validator stages. |
 | Quick then deep scan | UI resource strings distinguish Quick Scan and Advanced Scan; a string describes advanced scanning as sector-by-sector. | High | Fast metadata pass followed by opt-in resumable deep scan. |
 | Resume scan | `SaveScan` directory, `.rsf` records, and UI strings for loading/restoring prior session. | High | Versioned, checksummed checkpoints bound to device identity and geometry. |
@@ -36,6 +36,10 @@ The two ZIP archives are complementary deployment trees, not split segments: ext
 ## What the evidence does and does not prove
 
 The evidence proves deployed module boundaries, exports, configuration-driven type coverage, and visible workflow vocabulary. It does **not** prove internal algorithms, data structures, scan order, proprietary heuristics, license logic, or correctness claims. Those must be independently specified and validated.
+
+## Export-level interface observations
+
+The scanner DLLs expose factory names of the form `EUCreate<filesystem>QuickSearcher` and `EUCreate<filesystem>Searcher` (Btrfs uses `ComplateSearcher`). The raw module exports `EUCreateRAWSearcher`, `EUGetAnalyserList`, `EUGetAnalyserMap`, and `EUGetAnalyserMultimap`. This indicates a plug-in/factory boundary, not a reusable public specification. Our own implementation will use a separately designed Rust trait and data model rather than these interfaces.
 
 ## Functional flow inferred from evidence
 
