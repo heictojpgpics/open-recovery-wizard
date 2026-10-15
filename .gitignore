@@ -9,3 +9,4 @@ dist/
 .tauri/
 *.log
 .DS_Store
+.codex/
