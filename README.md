@@ -19,6 +19,9 @@ The repository currently holds a research baseline and original architecture pla
 - [Original recovery-engine architecture](docs/02-original-engine-architecture.md)
 - [Validation and safety plan](docs/03-validation-and-safety.md)
 - [Utility subsystem study](docs/04-utility-subsystems-study.md)
+- [Recovery algorithm reconstruction](docs/05-recovery-algorithm-reconstruction.md)
+- [Utility algorithm architecture](docs/06-utility-algorithm-architecture.md)
+- [Engineering program](docs/07-engineering-program.md)
 - [Worklog](docs/WORKLOG.md)
 
 ## Scope of the first release

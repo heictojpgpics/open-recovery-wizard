@@ -23,3 +23,9 @@
 - Recorded evidence for separate repair workers, Qt/QML health telemetry, vendor/transport-aware SMART and NVMe handling, FFmpeg-based media components, and dedicated preview processes.
 - Extended the original architecture with read-only health collection and isolated preview/repair brokers. Added strict no-mutation, no-encryption-bypass, licensing, provenance, and worker-isolation rules.
 - Created the public `heictojpgpics/open-recovery-wizard` repository and pushed the clean-room documentation baseline.
+
+## 2026-10-15 — algorithm-family reconstruction
+
+- Performed additional static interface and API analysis of recovery modules, filesystem scanner markers, raw-signature configuration, repair workers, and health/viewer components.
+- Converted the evidence into original scanner, carver, confidence, checkpoint, health, preview, repair, and build-program specifications.
+- Preserved the clean-room rule: no vendor code, signature table, visual assets, protected logic, or activation-related behavior is copied into this project.
