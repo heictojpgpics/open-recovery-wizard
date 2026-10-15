@@ -1,0 +1,11 @@
+# Supplied commercial binaries and all derived raw outputs stay local.
+evidence/
+reports/
+
+# Build products and local tooling.
+target/
+node_modules/
+dist/
+.tauri/
+*.log
+.DS_Store
