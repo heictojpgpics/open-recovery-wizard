@@ -178,5 +178,7 @@ under `re-evidence/` (Ghidra 12.1.4 headless). Findings by module:
    each analyser lands with its own fixture tests (quality bar: the
    tiered pipeline already enforces structure).
 3. dw-ext: jbd2 journal-dirent recovery (documented earlier).
-4. Btrfs first among the absent engines (most tractable public spec),
-   then ReFS (needs the deepest RE), then ZFS.
+4. Btrfs: **shipped** (2026-10-15 session) - single-device, non-RAID,
+   crc32c-verified, with the COW orphan-tree-block deep pass; all
+   struct offsets compiled against `btrfs_tree.h` with offsetof. ReFS
+   (deepest RE needed) and ZFS remain the honest absent engines.
