@@ -180,5 +180,24 @@ under `re-evidence/` (Ghidra 12.1.4 headless). Findings by module:
 3. dw-ext: jbd2 journal-dirent recovery (documented earlier).
 4. Btrfs: **shipped** (2026-10-15 session) - single-device, non-RAID,
    crc32c-verified, with the COW orphan-tree-block deep pass; all
-   struct offsets compiled against `btrfs_tree.h` with offsetof. ReFS
-   (deepest RE needed) and ZFS remain the honest absent engines.
+   struct offsets compiled against `btrfs_tree.h` with offsetof.
+5. ZFS: **shipped** (2026-10-16 session) - every constant extracted from
+   the OpenZFS headers/sources (label geometry, uberblock, blkptr/DVA
+   bitfields, dnode/objset, zap micro/fat, SA registry/layouts, XDR
+   nvlists; LZ4 carries a 4-byte BE payload length; LZJB control bits
+   are consumed LSB-first per 8-symbol group). Quick pass walks the
+   newest uberblock's tree; deep pass walks the previous-uberblock
+   generation (COW, mirroring our btrfs orphan pass). Single-device
+   pools only; mirrors/RAID-Z/multi-vdev/gang/encryption fall back to
+   raw carving with the reason recorded. Extents are the on-disk DVA
+   ranges (byte-faithful, including for compressed blocks).
+   Fixture-driven validation caught three real parser bugs before
+   ship: the zio_eck checksum offset (after zec_pad), XDR string
+   padding (NV_ALIGN4(strlen), NUL is padding), and fatzap
+   le_value_numints semantics (integer count, not chunk count).
+6. ReFS: in flight the honest way. No mainline or linux-next ReFS
+   driver exists (both trees checked; the "merged driver" recollection
+   was false - recorded to stop repetition). A real formatted ReFS
+   sample volume is built on CI (refs-sample.yml: known files,
+   timestamps, deletions) and will be dissected empirically - the
+   approach that produced the HFS+ engine against the real DMG.
