@@ -201,3 +201,84 @@ under `re-evidence/` (Ghidra 12.1.4 headless). Findings by module:
    sample volume is built on CI (refs-sample.yml: known files,
    timestamps, deletions) and will be dissected empirically - the
    approach that produced the HFS+ engine against the real DMG.
+
+## 9. Windows storage-stack enumeration — empirically validated (2026-10-16)
+
+The reference product reaches storage through its filter drivers; our
+user-mode path is now fully validated on real hardware (the release
+that shipped without this validation showed broken disk sizes — the
+exact failure mode this section records so it never recurs).
+
+Facts every future agent must keep:
+
+- **`GetFileSizeEx` does NOT work on device handles.** Physical-drive
+  and raw-volume handles do not answer `FileStandardInformation`; the
+  call fails or returns garbage. This was the "disk space showing is
+  broken" release bug. The authoritative size for a device handle is
+  `IOCTL_DISK_GET_LENGTH_INFO` (works on both physical drives and
+  volume devices).
+- **Real sector size** (4096 on Advanced Format): `IOCTL_DISK_GET_DRIVE_GEOMETRY_EX`
+  (the fixed part alone is ~33 bytes; give the driver ≥ 172 bytes for
+  the partition-information tail or it returns an error).
+- **Model / serial / bus / removable**: `IOCTL_STORAGE_QUERY_PROPERTY`
+  with `StorageDeviceProperty` + `PropertyStandardQuery`. The
+  descriptor is 36 bytes + inline ANSI strings, single-quoted by the
+  stack (`'Samsung '`); offsets are relative to the descriptor start;
+  0 means absent. Bus type is the u32 at +28 (STORAGE_BUS_TYPE).
+- **Volume → physical-drive mapping**: `IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS`
+  (`0x00560000`) on `\\.\C:` — returns (disk number, starting offset,
+  length) per extent. A handle opened with access mask 0 (query-only)
+  suffices, no elevation needed.
+- **Label / filesystem / free space**: `GetVolumeInformationW` +
+  `GetDiskFreeSpaceExW` + `GetDriveTypeW` — all work WITHOUT
+  elevation for mounted volumes.
+- **Elevation**: raw content reads (`GENERIC_READ` on `\\.\PhysicalDriveX`
+  / `\\.\X:`) require an elevated token. The entire category ships
+  `requireAdministrator` (the reference product's exe manifest
+  included); ours now does too (tauri-build `WindowsAttributes::app_manifest`).
+- **CI guard**: `dw-tauri.exe --diagnostics` (headless JSON report of
+  the whole storage stack) + smoke assertions — the shipped regression
+  is now build-breaking, not user-discovered.
+
+## 10. ReFS engine — empirical layout (validated against a real CI-built volume)
+
+Record shapes decoded from a Windows-formatted ReFS 3.14 volume
+(the `refs-sample.yml` builder); see `crates/dw-refs` for the code:
+
+- Boot sector: `ReFS` @0x03, `FSRS` @0x10, sector count @0x18,
+  bytes/sector @0x20 (512), sectors/cluster @0x24 (8 → 4 KiB or
+  128 → 64 KiB), version 3.x @0x28, serial @0x38.
+- `MSB+` metadata page header: magic @0, u32 (2 on 3.4–3.14) @4,
+  per-volume constant @0xC (shared with the superblock checksum
+  field), address quadruple @0x20..0x40. Records start at +0x80.
+- Name record: file id (u64, 1..65535) @0x18, name_chars+2 (u16)
+  @0x28, UTF-16 byte length @0x2A, name @0x2C.
+- File-info record (0xA8 bytes): length u32 @0 (== 0xA8), four
+  FILETIMEs @0x28/0x30/0x38/0x40 (create/modify/metadata-mod/access),
+  size u64 @0x58, file id u64 @0x80.
+- Deep pass: ReFS is page-level copy-on-write — superseded page
+  generations persist as headerless cluster copies; ids appearing
+  only there are deleted files. Content recovery for ReFS flows
+  through signature carving (the container/block-allocation data-run
+  indirection is the documented next milestone).
+
+## 11. Carver strategies shipped (beyond header/footer)
+
+All clean-room, from published literature + public format specs:
+
+- **Bifragment gap carving** (Richard & Roussev 2006): two-fragment
+  reassembly with per-format structure validation. Scope note: only
+  structure-chained formats (PNG/ZIP/MP4/PE); JPEG entropy data
+  accepts arbitrary continuation bytes, so wrong splits validate —
+  excluded by design rather than fabricating files.
+- **Structured ZIP carving**: exact archive ends via local-header
+  chain → central-directory → EOCD arithmetic cross-checks (stronger
+  than first-EOCD scanning; handles SFX stubs); backward carving from
+  EOCD records recovers archives with damaged headers.
+- **Map carving (scattered-chunk PNG)**: each chunk is CRC32-verified
+  in isolation (false link 2⁻³²); the chain follows expected positions
+  with cluster-aligned search; extents coalesce into maximal runs.
+- **Analyser hardening** (benefits every strategy): PNG chunk CRCs
+  and ZIP EOCD arithmetic are now enforced — structure-only walks
+  provably accepted wrong reassemblies (caught by the bifragment
+  test suite).
